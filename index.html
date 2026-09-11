@@ -32,6 +32,8 @@ html{
   overscroll-behavior-y: none;
   touch-action: pan-y;
   height: 100%;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 body{
@@ -42,6 +44,8 @@ body{
   overscroll-behavior-y: none;
   touch-action: pan-y;
   min-height: 100%;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 /* ---- Header ---- */
@@ -241,7 +245,7 @@ header p.sub{
 }
 
 /* ---- Menu sections ---- */
-main{ padding: 6px 16px 0; max-width: 640px; margin: 0 auto; background: var(--white); }
+main{ padding: 6px 16px 0; max-width: 640px; margin: 0 auto; background: var(--white); overflow-x: hidden; }
 
 .category{ margin-top: 34px; }
 .category h2{
@@ -267,18 +271,21 @@ main{ padding: 6px 16px 0; max-width: 640px; margin: 0 auto; background: var(--w
 }
 .dish.dimmed{ opacity: 0.32; }
 
-.dish-main{ flex:1; }
+.dish-main{ flex:1; min-width:0; }
 .dish-name-row{
   display:flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: baseline;
-  gap: 10px;
+  gap: 4px 10px;
 }
 .dish-name{
   font-family:'Fraunces', serif;
   font-weight: 600;
   font-size: 16.5px;
   color: var(--ink);
+  overflow-wrap: break-word;
+  min-width:0;
 }
 .verified-badge{
   font-family: 'Inter', sans-serif;
@@ -295,13 +302,15 @@ main{ padding: 6px 16px 0; max-width: 640px; margin: 0 auto; background: var(--w
   font-size: 14px;
   font-weight: 600;
   color: var(--navy);
-  white-space:nowrap;
+  overflow-wrap: break-word;
+  text-align: right;
 }
 .dish-desc{
   font-size: 13px;
   color: #4A5C78;
   margin-top: 4px;
   line-height: 1.4;
+  overflow-wrap: break-word;
 }
 .dish-tags{
   display:flex;
@@ -382,60 +391,6 @@ main{ padding: 6px 16px 0; max-width: 640px; margin: 0 auto; background: var(--w
 }
 .notice b{ color: var(--accent); }
 
-/* ---- QR panel ---- */
-.qr-panel{
-  margin: 40px 16px 0;
-  max-width: 608px;
-  margin-left:auto; margin-right:auto;
-  background: #fff;
-  border: 1px solid #C9D3E0;
-  border-radius: 12px;
-  padding: 20px;
-}
-.qr-panel h3{
-  font-family:'Fraunces', serif;
-  font-size: 16px;
-  margin-bottom: 6px;
-}
-.qr-panel p{
-  font-size: 12.5px;
-  color: #4A5C78;
-  line-height: 1.5;
-  margin-bottom: 12px;
-}
-.qr-row{
-  display:flex;
-  gap: 10px;
-  align-items:center;
-}
-.qr-row input{
-  flex:1;
-  padding: 9px 11px;
-  border: 1px solid #C9D3E0;
-  border-radius: 8px;
-  font-size: 13px;
-  font-family: 'Inter', sans-serif;
-}
-.qr-row button{
-  background: var(--navy);
-  color: var(--white);
-  border: none;
-  padding: 9px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-}
-#qr-output{
-  margin-top: 16px;
-  display:flex;
-  justify-content:center;
-}
-#qr-output img, #qr-output canvas{
-  border: 8px solid #fff;
-  outline: 1px solid #C9D3E0;
-}
-
 footer{
   text-align:center;
   font-size: 11px;
@@ -484,19 +439,8 @@ footer{
   <b>Where this data comes from:</b> dishes, prices, and descriptions are pulled from Fleet Landing's current published lunch, dinner, and dessert menus. Allergen tags on <b>✓ Recipe-verified</b> dishes are cross-checked against Fleet Landing's internal batch-prep recipe document (exact ingredients, e.g. flour and shrimp base in a roux, mayo in a sauce). Tags marked <i>"unconfirmed"</i> on any dish are still a best inference from a menu description alone — not confirmed by any recipe. The <b>Contains pork</b> badge comes directly from either the menu's own pork markers or a confirmed pork ingredient (ham hocks, bacon fat, andouille, tasso) in the recipe. For entrées and steaks with a default side, allergens tied only to that side are shown separately — swapping the side removes those tags. As always, please confirm directly with your server before ordering if you have a food allergy.
 </div>
 
-<div class="qr-panel">
-  <h3>Generate the QR code</h3>
-  <p>This page needs to live at a real, public web address before a QR code pointing to it will work for customers (for example, hosted as a page on the restaurant's website, or a free static host like GitHub Pages or Netlify). Once you have that link, paste it below to generate a printable QR code for table cards.</p>
-  <div class="qr-row">
-    <input id="qr-url" type="text" placeholder="https://your-restaurant-site.com/menu" />
-    <button id="qr-btn">Generate</button>
-  </div>
-  <div id="qr-output"></div>
-</div>
-
 <footer>Menu content sourced from Fleet Landing's published lunch/dinner menus, July 2026 — verify against the current printed menu before relying on it in-restaurant.</footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 /* =========================================================
    EDIT BELOW: this is the entire menu data set.
@@ -946,14 +890,6 @@ document.querySelectorAll('#meal-toggle .meal-btn').forEach(btn => {
     this.classList.add('active');
     renderMenu();
   });
-});
-
-document.getElementById('qr-btn').addEventListener('click', function(){
-  const url = document.getElementById('qr-url').value.trim();
-  const out = document.getElementById('qr-output');
-  out.innerHTML = '';
-  if(!url){ return; }
-  new QRCode(out, { text: url, width: 200, height: 200, colorDark: '#0A2A4A', colorLight: '#ffffff' });
 });
 
 renderPills();
