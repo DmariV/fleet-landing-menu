@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fleet Landing — Allergy-Aware Menu</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root{
+  --navy: #0A2A4A;
+  --navy-light: #14406E;
+  --accent: #3F72AF;
+  --white: #FFFFFF;
+  --paper: #EDF1F6;
+  --border: #C9D3E0;
+  --muted: #4A5C78;
+  --muted-2: #7A8AA0;
+  --flag: #B3261E;
+  --flag-bg: #F6DAD7;
+  --leaf: #2E6B3E;
+  --leaf-bg: #E2EEE3;
+  --ink: #16233B;
+  --safe: var(--navy);
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+
+html{
+  color-scheme: light only;
+  background: #FFFFFF;
+}
+
+body{
+  background: var(--white);
+  color: var(--ink);
+  font-family: 'Inter', sans-serif;
+  padding-bottom: 60px;
+}
+
+/* ---- Header ---- */
+header{
+  background: var(--navy);
+  color: var(--white);
+  padding: 28px 20px 22px;
+  position: relative;
+  overflow: hidden;
+}
+header .eyebrow{
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+header h1{
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 1.1;
+}
+header p.sub{
+  margin-top: 8px;
+  font-size: 13.5px;
+  color: #C7D2E3;
+  max-width: 480px;
+}
+.tide{
+  position:absolute;
+  bottom:-1px; left:0; right:0;
+  height: 18px;
+}
+
+/* ---- Safety banner ---- */
+/* ---- Meal toggle ---- */
+.meal-toggle{
+  display:flex;
+  background: var(--paper);
+  padding: 10px 16px;
+}
+.meal-btn{
+  flex:1;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--navy);
+  background: var(--white);
+  border: 2px solid var(--border);
+  padding: 10px 8px;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.meal-btn:first-child{ border-radius: 10px 0 0 10px; border-right: none; }
+.meal-btn:last-child{ border-radius: 0 10px 10px 0; }
+.meal-btn.active{
+  background: var(--navy);
+  border-color: var(--navy);
+  color: var(--white);
+}
+.meal-hours{
+  display:block;
+  font-size: 10.5px;
+  font-weight: 500;
+  opacity: 0.75;
+  margin-top: 2px;
+}
+
+.safety-banner{
+  background: #FBEAE8;
+  border-bottom: 3px solid var(--flag);
+  color: #7A2E22;
+  font-size: 12.5px;
+  line-height: 1.5;
+  padding: 12px 16px;
+}
+.safety-banner b{ color: var(--flag); }
+
+/* ---- Filter bar ---- */
+.filter-bar{
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--white);
+  border-bottom: 1px solid #C9D3E0;
+  padding: 12px 16px;
+}
+.filter-mode{
+  display:flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.filter-mode button{
+  flex:1;
+  border: 1px solid var(--navy);
+  background: transparent;
+  color: var(--navy);
+  padding: 7px 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border-radius: 20px;
+  cursor:pointer;
+  transition: all .15s ease;
+}
+.filter-mode button.active{
+  background: var(--navy);
+  color: var(--white);
+}
+.allergen-pills{
+  display:flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.pill{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  border: 1.5px solid var(--muted);
+  color: var(--muted);
+  background: #fff;
+  padding: 6px 11px 6px 8px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select:none;
+  transition: all .15s ease;
+}
+.pill svg{ width:14px; height:14px; }
+.pill.active{
+  background: var(--flag);
+  border-color: var(--flag);
+  color: #fff;
+}
+.filter-hint{
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 8px;
+}
+.diet-toggle{
+  display:flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+.diet-btn{
+  flex:1;
+  border: 1.5px solid var(--leaf);
+  background: var(--white);
+  color: var(--leaf);
+  padding: 7px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 20px;
+  cursor:pointer;
+  transition: all .15s ease;
+}
+.diet-btn.active{
+  background: var(--leaf);
+  color: var(--white);
+}
+.tag.veg{
+  background: var(--leaf-bg);
+  color: var(--leaf);
+}
+
+/* ---- Category nav ---- */
+.cat-nav{
+  display:flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 12px 16px 10px;
+  scrollbar-width: none;
+  background: var(--white);
+}
+.cat-nav::-webkit-scrollbar{ display:none; }
+.cat-nav .cat-btn{
+  font-family: 'Inter', sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--navy);
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 7px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.cat-nav .cat-btn:hover{ border-color: var(--accent); }
+.cat-nav .cat-btn.active{
+  background: var(--navy);
+  border-color: var(--navy);
+  color: var(--white);
+}
+
+/* ---- Menu sections ---- */
+main{ padding: 6px 16px 0; max-width: 640px; margin: 0 auto; background: var(--white); }
+
+.category{ margin-top: 34px; }
+.category h2{
+  font-family:'Fraunces', serif;
+  font-weight: 600;
+  font-size: 21px;
+  color: var(--navy);
+}
+.divider{
+  width: 100%;
+  height: 10px;
+  margin: 8px 0 16px;
+}
+
+.dish{
+  display:flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid #C9D3E0;
+  transition: opacity .2s ease;
+  background: var(--white);
+}
+.dish.dimmed{ opacity: 0.32; }
+
+.dish-main{ flex:1; }
+.dish-name-row{
+  display:flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+.dish-name{
+  font-family:'Fraunces', serif;
+  font-weight: 600;
+  font-size: 16.5px;
+  color: var(--ink);
+}
+.verified-badge{
+  font-family: 'Inter', sans-serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--leaf);
+  background: var(--leaf-bg);
+  padding: 2px 6px;
+  border-radius: 8px;
+  vertical-align: middle;
+  letter-spacing: 0.01em;
+}
+.dish-price{
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--navy);
+  white-space:nowrap;
+}
+.dish-desc{
+  font-size: 13px;
+  color: #4A5C78;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+.dish-tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap: 5px;
+  margin-top: 9px;
+}
+.side-block{
+  margin-top: 10px;
+  padding: 9px 10px;
+  background: var(--paper);
+  border-left: 3px solid var(--border);
+  border-radius: 4px;
+}
+.side-label{
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.side-tags{
+  margin-top: 7px;
+}
+.side-clean{
+  font-size: 11.5px;
+  color: var(--muted-2);
+  margin-top: 5px;
+}
+.tag{
+  font-size: 10.5px;
+
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 20px;
+  background: var(--paper);
+  color: var(--muted);
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+.tag.flagged{
+  background: #F6DAD7;
+  color: var(--flag);
+}
+.tag.unknown{
+  background: #E7ECF3;
+  color: #7A8AA0;
+  font-style: italic;
+}
+.tag.pork{
+  background: #DCE3ED;
+  color: #2C3E5C;
+}
+.tag svg{ width:10px; height:10px; }
+
+.safe-badge{
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--safe);
+  display:flex;
+  align-items:center;
+  gap:4px;
+  margin-top: 9px;
+}
+
+/* ---- Notice ---- */
+.notice{
+  background: var(--navy-light);
+  color: var(--white);
+  font-size: 12.5px;
+  line-height: 1.5;
+  padding: 14px 16px;
+  border-radius: 10px;
+  margin: 30px 16px 0;
+  max-width: 608px;
+  margin-left:auto; margin-right:auto;
+}
+.notice b{ color: var(--accent); }
+
+/* ---- QR panel ---- */
+.qr-panel{
+  margin: 40px 16px 0;
+  max-width: 608px;
+  margin-left:auto; margin-right:auto;
+  background: #fff;
+  border: 1px solid #C9D3E0;
+  border-radius: 12px;
+  padding: 20px;
+}
+.qr-panel h3{
+  font-family:'Fraunces', serif;
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+.qr-panel p{
+  font-size: 12.5px;
+  color: #4A5C78;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+.qr-row{
+  display:flex;
+  gap: 10px;
+  align-items:center;
+}
+.qr-row input{
+  flex:1;
+  padding: 9px 11px;
+  border: 1px solid #C9D3E0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+}
+.qr-row button{
+  background: var(--navy);
+  color: var(--white);
+  border: none;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+#qr-output{
+  margin-top: 16px;
+  display:flex;
+  justify-content:center;
+}
+#qr-output img, #qr-output canvas{
+  border: 8px solid #fff;
+  outline: 1px solid #C9D3E0;
+}
+
+footer{
+  text-align:center;
+  font-size: 11px;
+  color: #7A8AA0;
+  margin-top: 40px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Fleet Landing · 186 Concord St, Charleston, SC</div>
+  <h1>Full Menu</h1>
+  <p class="sub">Tap an allergen below to flag it. Dishes containing that allergen dim automatically — no separate menu to hunt for.</p>
+  <svg class="tide" viewBox="0 0 400 20" preserveAspectRatio="none"><path d="M0 10 Q 25 0, 50 10 T 100 10 T 150 10 T 200 10 T 250 10 T 300 10 T 350 10 T 400 10 V20 H0 Z" fill="#FFFFFF"/></svg>
+</header>
+
+<div class="meal-toggle" id="meal-toggle">
+  <button class="meal-btn active" data-meal="lunch">☀️ Lunch <span class="meal-hours">11am–3:30pm</span></button>
+  <button class="meal-btn" data-meal="dinner">🌙 Dinner <span class="meal-hours">5pm–10pm</span></button>
+</div>
+
+<div class="safety-banner">
+  <b>Important:</b> dishes marked <b>✓ Recipe-verified</b> have their allergen tags cross-checked against Fleet Landing's internal batch-prep recipes — a much stronger source than a menu description. Everything else is still Claude's best inference and hasn't been checked by the kitchen. Neither source accounts for last-minute recipe changes, ingredient substitutions, or cross-contact in the kitchen. Anyone with a food allergy should still confirm directly with their server before ordering, every time.
+</div>
+
+<div class="filter-bar">
+  <div class="filter-mode">
+    <button id="mode-dim" class="active">Dim flagged dishes</button>
+    <button id="mode-hide">Hide flagged dishes</button>
+  </div>
+  <div class="allergen-pills" id="pills"></div>
+  <div class="diet-toggle" id="diet-toggle">
+    <button class="diet-btn active" data-diet="all">All Diets</button>
+    <button class="diet-btn" data-diet="veg">🌱 Vegetarian</button>
+    <button class="diet-btn" data-diet="vegan">🌿 Vegan</button>
+  </div>
+  <div class="filter-hint" id="hint">No allergens flagged — showing full menu.</div>
+</div>
+
+<nav class="cat-nav" id="cat-nav"></nav>
+
+<main id="menu"></main>
+
+<div class="notice">
+  <b>Where this data comes from:</b> dishes, prices, and descriptions are pulled from Fleet Landing's current published lunch, dinner, and dessert menus. Allergen tags on <b>✓ Recipe-verified</b> dishes are cross-checked against Fleet Landing's internal batch-prep recipe document (exact ingredients, e.g. flour and shrimp base in a roux, mayo in a sauce). Tags marked <i>"unconfirmed"</i> on any dish are still Claude's best inference from a menu description alone — not confirmed by any recipe. The <b>Contains pork</b> badge comes directly from either the menu's own pork markers or a confirmed pork ingredient (ham hocks, bacon fat, andouille, tasso) in the recipe. For entrées and steaks with a default side, allergens tied only to that side are shown separately — swapping the side removes those tags.
+</div>
+
+<div class="qr-panel">
+  <h3>Generate the QR code</h3>
+  <p>This page needs to live at a real, public web address before a QR code pointing to it will work for customers (for example, hosted as a page on the restaurant's website, or a free static host like GitHub Pages or Netlify). Once you have that link, paste it below to generate a printable QR code for table cards.</p>
+  <div class="qr-row">
+    <input id="qr-url" type="text" placeholder="https://your-restaurant-site.com/menu" />
+    <button id="qr-btn">Generate</button>
+  </div>
+  <div id="qr-output"></div>
+</div>
+
+<footer>Menu content sourced from Fleet Landing's published lunch/dinner menus, July 2026 — verify against the current printed menu before relying on it in-restaurant.</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+/* =========================================================
+   EDIT BELOW: this is the entire menu data set.
+   Each dish: name, price, description, category,
+   allergens: array from the ALLERGENS list below that the dish DEFINITELY contains,
+   unconfirmed: array of allergens that MIGHT be present but haven't been verified yet
+   (e.g. a sauce with an unknown base, a fryer shared with gluten items).
+   ========================================================= */
+
+const ALLERGENS = [
+  {id:'gluten', label:'Gluten'},
+  {id:'shellfish', label:'Shellfish'},
+  {id:'tree_nut', label:'Tree Nut'},
+  {id:'peanut', label:'Peanut'},
+  {id:'dairy', label:'Dairy'},
+  {id:'soy', label:'Soy'},
+  {id:'egg', label:'Egg'},
+];
+
+const MENU = [
+  // ---- Raw Bar & Chilled Seafood (both) ----
+  {name:'Seafood Tower', price:'MKT', category:'Raw Bar & Chilled Seafood', meal:'both',
+   desc:'Split cold-water lobster tail, snow crab claws, oysters, shrimp cocktail, choice of smoked fish dip or crab dip, choice of ceviche or tartare. Serves 2 or 4. Additional oysters +$4 each.',
+   allergens:['shellfish'], unconfirmed:['dairy','egg','gluten','soy'], pork:false, verified:false},
+  {name:'Chilled Oysters', price:'Lunch $20/$38 · Dinner $21/$39', category:'Raw Bar & Chilled Seafood', meal:'both',
+   desc:'Half dozen or dozen, single-select oysters, housemade cocktail sauce, mignonette.',
+   allergens:['shellfish'], unconfirmed:[], pork:false, verified:true},
+  {name:'Shrimp Cocktail', price:'$18', category:'Raw Bar & Chilled Seafood', meal:'both',
+   desc:'Chilled jumbo white shrimp, housemade cocktail sauce.',
+   allergens:['shellfish'], unconfirmed:[], pork:false, verified:true},
+  {name:'Crab Claw Cocktail', price:'$18', category:'Raw Bar & Chilled Seafood', meal:'both',
+   desc:"Chilled snow crab claws, Fleet's mustard sauce.",
+   allergens:['shellfish','egg'], unconfirmed:[], pork:false, verified:true},
+  {name:'Smoked Fish Dip', price:'Lunch $12 · Dinner $14', category:'Raw Bar & Chilled Seafood', meal:'both',
+   desc:'Smoked local fish, assorted crackers.',
+   allergens:['gluten'], unconfirmed:['dairy'], pork:false, verified:false},
+  {name:'Chilled Blue Crab Dip', price:'Lunch $12 · Dinner $14', category:'Raw Bar & Chilled Seafood', meal:'both',
+   desc:'Assorted crackers.',
+   allergens:['shellfish','dairy','egg','gluten'], unconfirmed:[], pork:false, verified:true},
+  {name:'Ceviche', price:'$18', category:'Raw Bar & Chilled Seafood', meal:'both',
+   desc:'Citrus, cilantro, jalapeño, sweet potato chips.',
+   allergens:[], unconfirmed:['gluten'], pork:false, verified:true},
+  {name:'Tartare', price:'$18', category:'Raw Bar & Chilled Seafood', meal:'both',
+   desc:'Citrus and miso dressing, scallions, jalapeño, fried wontons.',
+   allergens:['gluten','soy'], unconfirmed:[], pork:false, verified:true},
+
+  // ---- Starters & Soups (both, unless noted) ----
+  {name:'Fried Green Tomato Stack', price:'Lunch $14 · Dinner $15', category:'Starters & Soups', meal:'both',
+   desc:'Tarragon crab salad, creamy shellfish sauce.',
+   allergens:['shellfish','gluten','dairy','egg'], unconfirmed:[], pork:false, verified:true},
+  {name:'Lump Crab Bruschetta', price:'Lunch $15 · Dinner $16', category:'Starters & Soups', meal:'both',
+   desc:'Goat cheese, basil pesto, balsamic tomatoes, balsamic glaze.',
+   allergens:['shellfish','dairy','gluten'], unconfirmed:[], pork:false, verified:true,
+   diet:{veg:'modifiable', vegan:'modifiable', note:'Ask to hold the crab meat for vegetarian. For vegan, also ask to hold the goat cheese — the housemade pesto itself is dairy from parmesan, so confirm a parmesan-free batch is available.'}},
+  {name:'Iron Skillet Mussels', price:'$15', category:'Starters & Soups', meal:'dinner',
+   desc:'Tomatoes, roasted garlic, shallots, white wine, cream, herb butter.',
+   allergens:['shellfish','dairy'], unconfirmed:[], pork:false, verified:false},
+  {name:'Signature Stuffed Hush Puppies', price:'$18', category:'Starters & Soups', meal:'both',
+   desc:'Velouté of lobster, shrimp, leeks, corn, Creole tomato sauce.',
+   allergens:['shellfish','gluten','dairy','egg'], unconfirmed:[], pork:false, verified:true},
+  {name:'Baked Spinach & Artichoke Dip', price:'$12', category:'Starters & Soups', meal:'both',
+   desc:'Feta, parmesan, and cheddar cheeses with gluten-free tortilla chips.',
+   allergens:['dairy'], unconfirmed:[], pork:false, verified:true,
+   diet:{veg:'yes', vegan:'no'}},
+  {name:'Carolina Lump Crab Cake (Starter)', price:'Lunch $17 · Dinner $18', category:'Starters & Soups', meal:'both',
+   desc:'Pickled corn relish, red pepper remoulade.',
+   allergens:['shellfish','egg','gluten'], unconfirmed:[], pork:false, verified:true},
+  {name:'Crispy Steak Calamari', price:'$15', category:'Starters & Soups', meal:'both',
+   desc:'Apricot glaze, red pepper remoulade.',
+   allergens:['shellfish','gluten','egg','soy'], unconfirmed:[], pork:false, verified:true},
+  {name:'Lowcountry Seafood Gumbo', price:'$10', category:'Starters & Soups', meal:'both',
+   desc:'Andouille sausage, okra, rice.',
+   allergens:['shellfish','gluten','dairy'], unconfirmed:[], pork:true, verified:true},
+  {name:'She Crab Soup', price:'$10', category:'Starters & Soups', meal:'both',
+   desc:'Blue crab roe, sherry. Add a Carolina lump crab cake for +$14.',
+   allergens:['shellfish','dairy','gluten'], unconfirmed:[], pork:false, verified:true},
+
+  // ---- Salads ----
+  {name:'Fleet Landing House Salad', price:'$9', category:'Salads', meal:'both',
+   desc:'Choice of balsamic vinaigrette, blue cheese, or creamy pepper parmesan. Add grilled chicken/shrimp +$10, grilled salmon/fried oysters +$12, crab cake +$14, fresh catch MKT, chilled rare flank steak +$12.',
+   allergens:['dairy'], unconfirmed:[], pork:false, verified:true,
+   diet:{veg:'yes', vegan:'modifiable', note:'Ask for balsamic vinaigrette with no cheese topping — that dressing itself has no dairy or other flagged allergens.'}},
+  {name:'Heart of Romaine Caesar Salad', price:'$9', category:'Salads', meal:'both',
+   desc:'Asiago, croutons, creamy garlic dressing.',
+   allergens:['dairy','gluten','egg'], unconfirmed:[], pork:false, verified:true,
+   diet:{veg:'no', vegan:'no', note:'The housemade Caesar dressing contains anchovy, per the recipe — not vegetarian.'}},
+  {name:'Iceberg Wedge Salad', price:'$10', category:'Salads', meal:'both',
+   desc:'Balsamic tomatoes, applewood-smoked bacon, crumbled blue cheese, red onion, blue cheese dressing.',
+   allergens:['dairy'], unconfirmed:[], pork:true, verified:true},
+  {name:'Charleston Cobb Salad', price:'$16', category:'Salads', meal:'lunch',
+   desc:'Grilled chicken, applewood-smoked bacon, balsamic tomatoes, eggs, avocado, black-eyed peas, blue cheese, balsamic vinaigrette.',
+   allergens:['egg','dairy'], unconfirmed:[], pork:true, verified:true},
+  {name:'Rare Flank Steak Salad', price:'Lunch $18 · Dinner $22', category:'Salads', meal:'both',
+   desc:'Baby mixed greens, chilled rare flank steak, tomatoes, asparagus, corn relish, herbed goat cheese, crispy shallots, sun-dried tomato vinaigrette.',
+   allergens:['dairy'], unconfirmed:['gluten'], pork:false, verified:true},
+  {name:'Mixed Greens with Seared Shrimp', price:'Lunch $16 · Dinner $20', category:'Salads', meal:'both',
+   desc:'Red grapes, spiced pecans, gorgonzola cheese, tomatoes, carrot curls, mixed berry vinaigrette.',
+   allergens:['shellfish','tree_nut','dairy','egg'], unconfirmed:[], pork:false, verified:true},
+  {name:'Baby Spinach Salad', price:'$9', category:'Salads', meal:'lunch',
+   desc:'Grilled shiitake mushrooms, applewood-smoked bacon, grape tomatoes, goat cheese, red onion, carrot curls, balsamic vinaigrette.',
+   allergens:['dairy'], unconfirmed:[], pork:true, verified:false},
+  {name:'Baby Spinach & Fried Oyster Salad', price:'$22', category:'Salads', meal:'dinner',
+   desc:'Grilled shiitake mushrooms, applewood-smoked bacon, grape tomatoes, goat cheese, red onion, carrot curls, balsamic vinaigrette.',
+   allergens:['shellfish','dairy','gluten'], unconfirmed:['egg'], pork:true, verified:false},
+
+  // ---- Sandwiches (lunch only — no sandwiches section on the current dinner menu) ----
+  {name:'Fried Oyster or Shrimp Po-Boy', price:'$16', category:'Sandwiches', meal:'lunch',
+   desc:'Lettuce, tomato, Cajun tartar sauce.',
+   allergens:['shellfish','gluten','egg'], unconfirmed:[], pork:false, verified:true},
+  {name:'Fried Flounder Sandwich', price:'$16', category:'Sandwiches', meal:'lunch',
+   desc:'Pepper Jack cheese, lettuce, tomato, Cajun tartar sauce.',
+   allergens:['gluten','dairy','egg'], unconfirmed:[], pork:false, verified:true},
+  {name:'Carolina Lump Crab Cake Sandwich', price:'$18', category:'Sandwiches', meal:'lunch',
+   desc:'Red onion, arugula, tomato, red pepper remoulade.',
+   allergens:['shellfish','gluten','egg'], unconfirmed:[], pork:false, verified:true},
+  {name:'Grilled Chicken Sandwich', price:'$14', category:'Sandwiches', meal:'lunch',
+   desc:'Smoked gouda, applewood-smoked bacon, red onion, tomato, arugula, honey mustard.',
+   allergens:['dairy','gluten','egg'], unconfirmed:[], pork:true, verified:true},
+  {name:'Fleet Landing Signature Burger', price:'$16', category:'Sandwiches', meal:'lunch',
+   desc:'Pimento cheese, applewood-smoked bacon, lettuce, tomato, crispy onions.',
+   allergens:['dairy','gluten','egg'], unconfirmed:[], pork:true, verified:true},
+  {name:'Fried Green Tomato "BLT"', price:'$14', category:'Sandwiches', meal:'lunch',
+   desc:'Applewood-smoked bacon, smoked gouda, arugula, red pepper remoulade.',
+   allergens:['dairy','gluten','egg'], unconfirmed:[], pork:true, verified:true},
+  {name:'Blackened Triggerfish Sandwich', price:'$16', category:'Sandwiches', meal:'lunch',
+   desc:'Avocado aioli, pepper Jack cheese, lettuce, tomato.',
+   allergens:['dairy','egg','gluten'], unconfirmed:[], pork:false, verified:true},
+  {name:'Classic 8oz Black Angus Burger', price:'$14', category:'Sandwiches', meal:'lunch',
+   desc:'Lettuce, tomato, red onion, choice of side. Add cheese +$1, bacon +$2, fried green tomato +$2.',
+   allergens:['gluten'], unconfirmed:['egg','dairy'], pork:false, verified:false},
+
+  // ---- Entrées ----
+  {name:"Fleet Landing's Fresh Catch", price:'Lunch MKT · Dinner: Tuna $30 / Scallops MKT / Salmon $28 / Shrimp $26', category:'Entrées', meal:'both',
+   desc:'Yellowfin tuna, sea scallops, Atlantic salmon, or jumbo shrimp — char-grilled or pan-roasted. Dinner: choice of 1 sauce + 2 sides (Blackened Seasoning, Charred Tomato Vinaigrette, Garden Fresh Pesto, Ginger Honey Glaze, or Lemon Dill Shallot Butter; additional sauces +$1). Lunch: served with vegetable of the day + Charleston red rice.',
+   allergens:[], unconfirmed:['shellfish'], pork:false, verified:false,
+   side:{label:'protein choice determines shellfish (scallops/shrimp = shellfish; tuna/salmon do not); most sauce options contain dairy — only Charred Tomato Vinaigrette and Ginger Honey Glaze (which has soy) do not', allergens:[], unconfirmed:['dairy','soy'], pork:true}},
+  {name:'Charleston Shrimp & Grits', price:'Lunch $18 · Dinner $27', category:'Entrées', meal:'both',
+   desc:'Shrimp and andouille sausage sautéed in tasso ham gravy over creamy grits made with heavy cream.',
+   allergens:['shellfish','gluten','dairy'], unconfirmed:[], pork:true, verified:true},
+  {name:'Chicken Piccata', price:'$23', category:'Entrées', meal:'dinner',
+   desc:'Pan-seared chicken breast, lemon, capers, sun-dried tomatoes, asparagus, fettuccini.',
+   allergens:['gluten','dairy'], unconfirmed:[], pork:false, verified:true},
+  {name:"Chef's Fresh Fish Selection", price:'MKT', category:'Entrées', meal:'dinner',
+   desc:'Fingerling potato and sun-dried tomato hash, asparagus, citrus basil butter.',
+   allergens:['dairy'], unconfirmed:['gluten'], pork:false, verified:true},
+  {name:'Carolina Lump Crab Cakes (Entrée)', price:'Lunch $32 · Dinner $34', category:'Entrées', meal:'both',
+   desc:'Crab cake with pickled corn relish and red pepper sauce.',
+   allergens:['shellfish','egg','gluten'], unconfirmed:[], pork:false, verified:true,
+   side:{label:'garlic mashed potatoes + vegetable of the day (dinner) or choice of 2 sides (lunch)', allergens:['dairy'], unconfirmed:[], pork:false}},
+  {name:'Crispy Whole Fried Flounder', price:'$30', category:'Entrées', meal:'both',
+   desc:'Whole fried flounder topped with an apricot glaze.',
+   allergens:['gluten','soy'], unconfirmed:['dairy'], pork:false, verified:true,
+   side:{label:'vegetable of the day + Charleston red rice', allergens:[], unconfirmed:[], pork:true}},
+  {name:'Lowcountry Seafood Pasta', price:'$28', category:'Entrées', meal:'both',
+   desc:'Fettuccini, shrimp, scallops, crawfish, mussels, andouille sausage, asparagus, tomatoes, parmesan, Creole butter sauce.',
+   allergens:['shellfish','gluten','dairy'], unconfirmed:[], pork:true, verified:true},
+  {name:'Blackened Cobia', price:'$25', category:'Entrées', meal:'dinner',
+   desc:'Pan-seared with pimento cheese grits, grilled asparagus.',
+   allergens:[], unconfirmed:[], pork:false, verified:true,
+   side:{label:'pimento cheese grits + grilled asparagus', allergens:['dairy','egg'], unconfirmed:[], pork:false}},
+  {name:'Seared Salmon', price:'$20', category:'Entrées', meal:'lunch',
+   desc:'Seared salmon with lemon dill shallot butter.',
+   allergens:['dairy'], unconfirmed:[], pork:false, verified:true,
+   side:{label:'green beans + Charleston red rice', allergens:[], unconfirmed:[], pork:true}},
+  {name:'Herb-Encrusted Baked Cod', price:'$15', category:'Entrées', meal:'lunch',
+   desc:'Herb-encrusted baked cod with lemon dill shallot butter.',
+   allergens:['dairy'], unconfirmed:['gluten'], pork:false, verified:true,
+   side:{label:'green beans + Charleston red rice', allergens:[], unconfirmed:[], pork:true}},
+  {name:'Fried Seafood Platter', price:'Lunch: 1 $18 / 2 $28 / 3 $30 · Dinner: Shrimp $24 / Flounder $24 / Oysters $27 / 2 $28 / 3 $30', category:'Entrées', meal:'both',
+   desc:'Flounder, shrimp, and/or oysters — choice of one, two, or all three. Lunch served with French fries and coleslaw; dinner served with choice of two sides.',
+   allergens:['gluten'], unconfirmed:['shellfish','egg'], pork:false, verified:false},
+
+  // ---- Steaks (dinner only) ----
+  {name:'8oz Filet Mignon', price:'$40', category:'Steaks', meal:'dinner',
+   desc:'Fingerling potatoes, green beans, demi-glace. Add mushroom + truffle butter +$4, seared shrimp +$10, or crab cake +$14.',
+   allergens:[], unconfirmed:['gluten','dairy'], pork:false, verified:true,
+   side:{label:'fingerling potatoes + green beans', allergens:[], unconfirmed:[], pork:false}},
+  {name:'14oz Boneless Ribeye', price:'$46', category:'Steaks', meal:'dinner',
+   desc:'Fingerling potatoes, green beans, demi-glace. Add mushroom + truffle butter +$4, seared shrimp +$10, or crab cake +$14.',
+   allergens:[], unconfirmed:['gluten','dairy'], pork:false, verified:true,
+   side:{label:'fingerling potatoes + green beans', allergens:[], unconfirmed:[], pork:false}},
+
+  // ---- Sides ----
+  {name:'Pimento Cheese Grits', price:'+$2', category:'Sides', meal:'both',
+   desc:'Creamy stone-ground grits with pimento cheese.',
+   allergens:['dairy','egg'], unconfirmed:[], pork:false, verified:true,
+   diet:{veg:'yes', vegan:'no'}},
+  {name:'Lowcountry Grits', price:'included', category:'Sides', meal:'both',
+   desc:'Classic creamy stone-ground grits made with heavy cream.',
+   allergens:['dairy'], unconfirmed:[], pork:false, verified:false,
+   diet:{veg:'yes', vegan:'no'}},
+  {name:'Garlic Mashed Potatoes', price:'included', category:'Sides', meal:'dinner',
+   desc:'Butter and garlic mashed potatoes.',
+   allergens:['dairy'], unconfirmed:[], pork:false, verified:false,
+   diet:{veg:'yes', vegan:'no'}},
+  {name:'Collard Greens', price:'included', category:'Sides', meal:'both',
+   desc:'Slow-cooked Southern-style collards.',
+   allergens:[], unconfirmed:[], pork:true, verified:true,
+   diet:{veg:'no', vegan:'no', note:'Cooked in bacon fat with ham hocks, per the recipe.'}},
+  {name:'Charleston Red Rice', price:'included', category:'Sides', meal:'both',
+   desc:'Tomato-based Lowcountry rice.',
+   allergens:[], unconfirmed:[], pork:true, verified:true,
+   diet:{veg:'no', vegan:'no', note:'Made with bacon fat and smoked sausage, per the recipe.'}},
+  {name:'Coleslaw', price:'included', category:'Sides', meal:'both',
+   desc:'Classic creamy slaw.',
+   allergens:['egg'], unconfirmed:[], pork:false, verified:true,
+   diet:{veg:'yes', vegan:'no'}},
+  {name:'French Fries', price:'included', category:'Sides', meal:'both',
+   desc:'Crispy fried potatoes.',
+   allergens:[], unconfirmed:['gluten'], pork:false, verified:false,
+   diet:{veg:'unconfirmed', vegan:'unconfirmed', note:'Confirm the fryer isn\'t shared with breaded seafood if strict cross-contact avoidance matters.'}},
+  {name:'Green Beans', price:'included', category:'Sides', meal:'both',
+   desc:'Steamed, seasoned with salt and pepper.',
+   allergens:[], unconfirmed:[], pork:false, verified:true,
+   diet:{veg:'yes', vegan:'yes'}},
+  {name:'Asparagus', price:'Lunch +$2 · Dinner included', category:'Sides', meal:'both',
+   desc:'Steamed, seasoned with salt and pepper.',
+   allergens:[], unconfirmed:[], pork:false, verified:true,
+   diet:{veg:'yes', vegan:'yes'}},
+  {name:'Broccoli', price:'Lunch +$2 · Dinner included', category:'Sides', meal:'both',
+   desc:'Steamed, seasoned with salt and pepper.',
+   allergens:[], unconfirmed:[], pork:false, verified:true,
+   diet:{veg:'yes', vegan:'yes'}},
+  {name:'Carrots', price:'included', category:'Sides', meal:'both',
+   desc:'Pan-seared with garlic, salt, and pepper.',
+   allergens:[], unconfirmed:[], pork:false, verified:true,
+   diet:{veg:'yes', vegan:'yes'}},
+  {name:'Mixed Vegetables', price:'included', category:'Sides', meal:'both',
+   desc:'Steamed broccoli with carrots, red and green peppers seared on the flat top, salt and pepper.',
+   allergens:[], unconfirmed:[], pork:false, verified:true,
+   diet:{veg:'yes', vegan:'yes'}},
+  {name:'Vegetable of the Day', price:'included', category:'Sides', meal:'both',
+   desc:'Rotating daily vegetable.',
+   allergens:[], unconfirmed:['dairy'], pork:false, verified:false,
+   diet:{veg:'unconfirmed', vegan:'unconfirmed', note:'Changes daily — ask your server what today\'s vegetable and its prep are.'}},
+  {name:'Pasta Salad', price:'included', category:'Sides', meal:'lunch',
+   desc:'Rotini, cherry tomatoes, cucumber, red onion, olives, feta, herbs.',
+   allergens:['gluten','dairy'], unconfirmed:[], pork:false, verified:true,
+   diet:{veg:'yes', vegan:'no'}},
+  {name:'Tomato + Cucumber Salad', price:'included', category:'Sides', meal:'lunch',
+   desc:'Cucumber, tomato, red onion, garlic, fresh herbs.',
+   allergens:[], unconfirmed:[], pork:false, verified:true,
+   diet:{veg:'yes', vegan:'yes'}},
+
+  // ---- Desserts (both) ----
+  {name:'Key Lime Pie', price:'$10', category:'Desserts', meal:'both',
+   desc:'Graham cracker crust, raspberry sauce.',
+   allergens:['dairy','egg','gluten'], unconfirmed:[], pork:false, verified:true,
+   diet:{veg:'yes', vegan:'no'}},
+  {name:'White Chocolate Bread Pudding', price:'$10', category:'Desserts', meal:'both',
+   desc:'Brioche bread pudding, white chocolate, crème anglaise.',
+   allergens:['gluten','dairy','egg'], unconfirmed:[], pork:false, verified:true,
+   diet:{veg:'yes', vegan:'no'}},
+  {name:'Southern Pecan Pie', price:'$10', category:'Desserts', meal:'both',
+   desc:'Bourbon pecan pie. Add vanilla ice cream +$1.',
+   allergens:['gluten','egg','tree_nut'], unconfirmed:['dairy'], pork:false, verified:true,
+   diet:{veg:'yes', vegan:'no'}},
+  {name:'Fleet Landing Chocolate Torte', price:'$10', category:'Desserts', meal:'both',
+   desc:'Cinnamon pecan crust, whipped cream, chocolate sauce.',
+   allergens:['gluten','dairy','egg','tree_nut'], unconfirmed:[], pork:false, verified:true,
+   diet:{veg:'yes', vegan:'no'}},
+];
+
+/* ========================================================= */
+
+const state = { flagged: new Set(), mode: 'dim', category: null, diet: 'all', meal: 'lunch' };
+
+function iconFor(id){
+  const icons = {
+    gluten: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 L14 8 L20 10 L14 12 L12 18 L10 12 L4 10 L10 8 Z"/></svg>',
+    shellfish: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14 C4 9 8 5 12 5 C16 5 20 9 20 14 C20 18 16 19 12 19 C8 19 4 18 4 14 Z"/><path d="M8 14 L8 19 M16 14 L16 19"/></svg>',
+    tree_nut: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 C7 3 5 8 5 13 C5 18 8 21 12 21 C16 21 19 18 19 13 C19 8 17 3 12 3 Z"/><path d="M12 3 V21"/></svg>',
+    peanut: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="7.5" rx="4" ry="5"/><ellipse cx="12" cy="16.5" rx="4" ry="5"/></svg>',
+    dairy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 2 H15 V6 L17 9 V21 H7 V9 L9 6 Z"/></svg>',
+    soy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><circle cx="12" cy="16" r="3"/></svg>',
+    egg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 C7 3 5 12 5 16 C5 19.5 8 21 12 21 C16 21 19 19.5 19 16 C19 12 17 3 12 3 Z"/></svg>',
+  };
+  return icons[id] || '';
+}
+
+function renderPills(){
+  const wrap = document.getElementById('pills');
+  wrap.innerHTML = ALLERGENS.map(a => `
+    <div class="pill" data-id="${a.id}">
+      ${iconFor(a.id)}<span>${a.label}</span>
+    </div>
+  `).join('');
+  wrap.querySelectorAll('.pill').forEach(p => {
+    p.addEventListener('click', () => {
+      const id = p.dataset.id;
+      if(state.flagged.has(id)) state.flagged.delete(id);
+      else state.flagged.add(id);
+      p.classList.toggle('active');
+      renderMenu();
+      updateHint();
+    });
+  });
+}
+
+function updateHint(){
+  const hint = document.getElementById('hint');
+  if(state.flagged.size === 0){
+    hint.textContent = 'No allergens flagged — showing full menu.';
+  } else {
+    const labels = ALLERGENS.filter(a => state.flagged.has(a.id)).map(a => a.label).join(', ');
+    hint.textContent = `Flagging: ${labels}. Dishes with these (confirmed or unconfirmed) are ${state.mode === 'hide' ? 'hidden' : 'dimmed'} below.`;
+  }
+}
+
+function dishMatchesFlagged(dish){
+  const core = [...dish.allergens, ...dish.unconfirmed];
+  const side = dish.side ? [...dish.side.allergens, ...dish.side.unconfirmed] : [];
+  return [...core, ...side].some(a => state.flagged.has(a));
+}
+
+function dishMatchesDiet(dish){
+  if(state.diet === 'all') return true;
+  if(!dish.diet) return false;
+  const val = state.diet === 'veg' ? dish.diet.veg : dish.diet.vegan;
+  return val === 'yes' || val === 'modifiable';
+}
+
+function mealMatches(dish){
+  return dish.meal === 'both' || dish.meal === state.meal;
+}
+
+function renderMenu(){
+  const mealMenu = MENU.filter(mealMatches);
+  const categories = [...new Set(mealMenu.map(d => d.category))];
+  if(state.category && !categories.includes(state.category)) state.category = null;
+  const menuEl = document.getElementById('menu');
+  const navEl = document.getElementById('cat-nav');
+
+  const activeCategories = state.category ? [state.category] : categories;
+
+  navEl.innerHTML = [
+    `<button class="cat-btn ${!state.category ? 'active' : ''}" data-cat="">All</button>`,
+    ...categories.map(c => `<button class="cat-btn ${state.category === c ? 'active' : ''}" data-cat="${c}">${c}</button>`)
+  ].join('');
+
+  navEl.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.category = btn.dataset.cat || null;
+      renderMenu();
+    });
+  });
+
+  menuEl.innerHTML = activeCategories.map(cat => {
+    const dishes = mealMenu.filter(d => d.category === cat && dishMatchesDiet(d));
+    const dishHtml = dishes.map(d => {
+      const flagged = dishMatchesFlagged(d);
+      if(flagged && state.mode === 'hide') return '';
+      const coreTags = [
+        ...d.allergens.map(a => tagHtml(a, true, false)),
+        ...d.unconfirmed.map(a => tagHtml(a, false, true)),
+        ...(d.pork ? [`<span class="tag pork">Contains pork</span>`] : []),
+      ].join('');
+      const s = d.side;
+      const sideHasTags = s && (s.allergens.length || s.unconfirmed.length || s.pork);
+      const sideTags = sideHasTags ? [
+        ...s.allergens.map(a => tagHtml(a, true, false)),
+        ...s.unconfirmed.map(a => tagHtml(a, false, true)),
+        ...(s.pork ? [`<span class="tag pork">Contains pork</span>`] : []),
+      ].join('') : '';
+      const safe = (d.allergens.length === 0 && d.unconfirmed.length === 0 && !d.pork && !sideHasTags);
+      const dietTags = dietTagHtml(d.diet);
+      return `
+        <div class="dish ${flagged && state.mode === 'dim' ? 'dimmed' : ''}">
+          <div class="dish-main">
+            <div class="dish-name-row">
+              <div class="dish-name">${d.name}${d.verified ? ' <span class="verified-badge" title="Cross-checked against Fleet Landing\'s internal prep recipe">✓ Recipe-verified</span>' : ''}</div>
+              <div class="dish-price">${d.price}</div>
+            </div>
+            <div class="dish-desc">${d.desc}</div>
+            ${dietTags.tags ? `<div class="dish-tags">${dietTags.tags}</div>` : ''}
+            ${dietTags.note ? `<div class="side-clean">${dietTags.note}</div>` : ''}
+            ${coreTags ? `<div class="dish-tags">${coreTags}</div>` : ''}
+            ${s ? `
+              <div class="side-block">
+                <div class="side-label">Standard side: ${s.label}</div>
+                ${sideTags ? `<div class="dish-tags side-tags">${sideTags}</div>` : `<div class="side-clean">No flagged allergens from the standard side</div>`}
+              </div>
+            ` : ''}
+            ${safe ? `<div class="safe-badge">✓ No flagged allergens on file</div>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+    return `
+      <div class="category" id="cat-${slug(cat)}">
+        <h2>${cat}</h2>
+        <svg class="divider" viewBox="0 0 400 10" preserveAspectRatio="none"><path d="M0 5 Q 20 0, 40 5 T 80 5 T 120 5 T 160 5 T 200 5 T 240 5 T 280 5 T 320 5 T 360 5 T 400 5" stroke="#3F72AF" stroke-width="2" fill="none"/></svg>
+        ${dishHtml || '<p style="font-size:13px;color:#7A8AA0;">No dishes match the current filter in this section.</p>'}
+      </div>
+    `;
+  }).join('');
+}
+
+function tagHtml(id, confirmed, unconfirmed){
+  const a = ALLERGENS.find(x => x.id === id);
+  const label = unconfirmed ? `${a.label} (unconfirmed)` : a.label;
+  return `<span class="tag ${confirmed ? 'flagged' : 'unknown'}">${iconFor(id)}${label}</span>`;
+}
+
+function dietTagHtml(diet){
+  if(!diet) return {tags:'', note:''};
+  const tags = [];
+  const notes = [];
+  if(diet.veg === 'yes') tags.push(`<span class="tag veg">🌱 Vegetarian</span>`);
+  else if(diet.veg === 'modifiable') tags.push(`<span class="tag veg">🌱 Vegetarian option</span>`);
+  else if(diet.veg === 'unconfirmed') tags.push(`<span class="tag unknown">🌱 Vegetarian (unconfirmed)</span>`);
+  if(diet.vegan === 'yes') tags.push(`<span class="tag veg">🌿 Vegan</span>`);
+  else if(diet.vegan === 'modifiable') tags.push(`<span class="tag veg">🌿 Vegan option</span>`);
+  else if(diet.vegan === 'unconfirmed') tags.push(`<span class="tag unknown">🌿 Vegan (unconfirmed)</span>`);
+  if(diet.note) notes.push(diet.note);
+  return {tags: tags.join(''), note: notes.join(' ')};
+}
+
+function slug(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,'-'); }
+
+document.getElementById('mode-dim').addEventListener('click', function(){
+  state.mode = 'dim';
+  this.classList.add('active');
+  document.getElementById('mode-hide').classList.remove('active');
+  renderMenu(); updateHint();
+});
+document.getElementById('mode-hide').addEventListener('click', function(){
+  state.mode = 'hide';
+  this.classList.add('active');
+  document.getElementById('mode-dim').classList.remove('active');
+  renderMenu(); updateHint();
+});
+
+document.querySelectorAll('#diet-toggle .diet-btn').forEach(btn => {
+  btn.addEventListener('click', function(){
+    state.diet = this.dataset.diet;
+    document.querySelectorAll('#diet-toggle .diet-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    renderMenu();
+  });
+});
+
+document.querySelectorAll('#meal-toggle .meal-btn').forEach(btn => {
+  btn.addEventListener('click', function(){
+    state.meal = this.dataset.meal;
+    document.querySelectorAll('#meal-toggle .meal-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    renderMenu();
+  });
+});
+
+document.getElementById('qr-btn').addEventListener('click', function(){
+  const url = document.getElementById('qr-url').value.trim();
+  const out = document.getElementById('qr-output');
+  out.innerHTML = '';
+  if(!url){ return; }
+  new QRCode(out, { text: url, width: 200, height: 200, colorDark: '#0A2A4A', colorLight: '#ffffff' });
+});
+
+renderPills();
+renderMenu();
+updateHint();
+</script>
+
+</body>
+</html>
